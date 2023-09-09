@@ -6,7 +6,7 @@ from PIL import Image, ImageOps, ImageDraw, ImageFont, ImageFilter
 from datetime import datetime
 
 # Variables
-filename = "tmpbadge.png"
+filename = "receipt.png"
 headerheight = 180
 finalRun = False
 totalHeight = 8000
