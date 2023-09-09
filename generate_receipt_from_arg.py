@@ -90,7 +90,7 @@ def print_frituur_receipt():
         )'''
     p = Network("10.33.0.22",profile='TM-T88V')
     enablePrint()
-    p.image("tmpbadge.png")
+    p.image(filename)
     p.cut()
 
 #    print("Receipt sent to printer")
