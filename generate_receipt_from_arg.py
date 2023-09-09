@@ -88,7 +88,7 @@ def print_frituur_receipt():
         timeout=1.00,
         dsrdtr=True
         )'''
-    p = Network("192.168.192.168",profile='TM-T88V')
+    p = Network("10.33.0.22",profile='TM-T88V')
     enablePrint()
     p.image("tmpbadge.png")
     p.cut()
