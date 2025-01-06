@@ -1,0 +1,23 @@
+{
+    "user": "PA3L",
+    "items": [
+      {
+        "quantity": 111,
+        "description": "(Frituur) Bitterballen 6 stuks",
+        "product_id": "bitterballen",
+        "temperature": "5"
+      },
+      {
+        "quantity": 8,
+        "description": "(Frituur) Frikandel",
+        "product_id": "frikandel",
+        "temperature": "4"
+      },
+      {
+        "quantity": 1,
+        "description": "(Frituur) Patat",
+        "product_id": "patat",
+        "temperature": 1
+      }
+    ]
+  }

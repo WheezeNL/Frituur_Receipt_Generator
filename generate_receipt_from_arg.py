@@ -5,12 +5,14 @@ from escpos.printer import Network
 from PIL import Image, ImageOps, ImageDraw, ImageFont, ImageFilter
 from datetime import datetime
 
+debug = True
+
 # Variables
 filename = "receipt.png"
 headerheight = 180
 finalRun = False
-totalHeight = 8000
 maxWidth = 512
+printer = "network" #serial or network
 
 # Disable Print
 def blockPrint():
@@ -21,6 +23,8 @@ def enablePrint():
     sys.stdout = sys.__stdout__
 
 def prepare_receipt(message):
+    if debug:
+        print(message)
     runs = 0
     totalHeight = 8000
     data = json.loads(message)
@@ -53,24 +57,32 @@ def prepare_receipt(message):
         draw.text([280,headerheight-40],'In Pan  Uitgeleverd',fill= 'black',font=headerfont)
         draw.line((0, headerheight, maxWidth, headerheight),fill='black',width=3)
 
-        pi4dec = Image.open('img_pi4dec.png')
-        img.paste(pi4dec,[maxWidth - 140,20])
+        logo = Image.open('logo.png')
+        img.paste(logo,[maxWidth - 140,20])
 
         # Items
-        regels = 0
+        rows = 0
         for item in items:
+            extrarow = False
             quantity = str(item["quantity"])
-            name = item["description"].split("(Frituur) ",1)[1]
+            itemname = item["description"].split("(Frituur) ",1)[1]
             if (quantity > '1'):
-                completeItem = quantity + "x " + name
-            else:
-                completeItem = name
-            if(len(completeItem)>16):
-                completeItem = completeItem + "\n\t"
-            draw.text([0,headerheight+(regels*45)],completeItem,fill= 'black',font=font)
-            draw.rounded_rectangle([280,headerheight+(regels*45)+10,310,headerheight+(regels*45)+40],5,'white','black',3)
-            draw.rounded_rectangle([370,headerheight+(regels*45)+10,400,headerheight+(regels*45)+40],5,'white','black',3)
-            regels = regels+1
+                itemname = quantity + "x " + itemname
+            if(len(itemname)>20):
+                print(itemname + " too long!")
+                extrarow = True
+            draw.text([0,headerheight+(rows*45)],itemname,fill='black',font=font)
+            if extrarow:
+                rows = rows+1
+            draw.rounded_rectangle([280,headerheight+(rows*45)+10,310,headerheight+(rows*45)+40],5,'white','black',3)
+            '''draw.rounded_rectangle([370,headerheight+(rows*45)+10,400,headerheight+(rows*45)+40],5,'white','black',3)
+            if "frytime" in item:
+                draw.text([maxWidth-10,headerheight+(rows*45)],str(item["frytime"])+"m",fill= 'black',anchor="ra",font=font)
+            rows = rows+1'''
+            draw.rounded_rectangle([maxWidth-40,headerheight+(rows*45)+10,maxWidth-10,headerheight+(rows*45)+40],5,'white','black',3)
+            if "frytime" in item:
+                draw.text([430,headerheight+(rows*45)],str(item["frytime"])+" min",fill= 'black',anchor="ra",font=font)
+            rows = rows+1
         draw = ImageDraw.Draw(img)
         test1,test2,test3,totalHeight = img.getbbox()
         totalHeight = totalHeight + 10
@@ -79,25 +91,32 @@ def prepare_receipt(message):
 
 def print_frituur_receipt():
     blockPrint()
-    """ 9600 Baud, 8N1, Flow Control Enabled """
-    '''p = Serial(devfile='/dev/ttyUSB0',
+    if printer == "serial":
+        """ 9600 Baud, 8N1, Flow Control Enabled """
+        p = Serial(devfile='/dev/ttyUSB0',
         baudrate=9600,
         bytesize=8,
         parity='N',
         stopbits=1,
         timeout=1.00,
         dsrdtr=True
-        )'''
-    p = Network("10.33.0.22",profile='TM-T88V')
+        )
+    elif printer == "network":
+        p = Network("10.33.0.22",profile='TM-T88V')
     enablePrint()
     p.image(filename)
     p.cut()
 
-#    print("Receipt sent to printer")
-
 if len(sys.argv)>1: #print accountname and firstname
     print("\nIk stuur de frituurbestelling naar de printer!\n")
     prepare_receipt(sys.argv[1])
-    print_frituur_receipt()
+    if debug:
+        print("Debug enabled: Not printing!")
+    else:
+        print_frituur_receipt()
+elif debug:
+    print("\nDebug enabled, just testing, not printing\n")
+    testdata = r'''{"user":"PA3L","items":[{"quantity":1,"description":"(Frituur) Frikandel","product_id":"frikandel","frytime":"4"},{"quantity":2,"description":"(Frituur) Bitterballen 6 stuks","product_id":"bitterballen","frytime":"5"},{"quantity":1,"description":"(Frituur) Patat","product_id":"patat"}]}'''
+    prepare_receipt(str(testdata))  
 else: #give a nice prompt
     print("So, I was hoping for some JSON, but got none")
