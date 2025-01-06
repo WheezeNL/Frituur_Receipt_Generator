@@ -1,11 +1,23 @@
 {
-    "account": "PA3L",
+    "user": "TESTER",
     "items": [
-        {
-            "name": "2x Frikandel"
-        },
-        {
-            "name": "Grote Friet"
-        }
+      {
+        "quantity": 2,
+        "description": "(Frituur) Bitterballen 6 stuks",
+        "product_id": "bitterballen",
+        "temperature": "5"
+      },
+      {
+        "quantity": 8,
+        "description": "(Frituur) Frikandel",
+        "product_id": "frikandel",
+        "temperature": "4"
+      },
+      {
+        "quantity": 1,
+        "description": "(Frituur) Patat",
+        "product_id": "patat",
+        "temperature": 1
+      }
     ]
-}
+  }
